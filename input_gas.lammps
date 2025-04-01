@@ -1,8 +1,7 @@
 # LAMMPS Input Script
 
 # command to run:
-# lmp -var F C92x5x5.data -var M CH4.lmp -i input_gas.lammps
-
+# lmp -var F C92x5x5.data -var M CH4.lmp -var T solubility -i input_gas.lammps
 # F is file, M is molecule
 
 units real
@@ -59,7 +58,7 @@ label do_freeze
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 10
+  run 100000
    # define mobile ensemble
   variable xl equal xlo
   variable xh equal xhi
@@ -100,24 +99,37 @@ run 101
 # Define molecule template
 molecule CH4mol molecules/$M
 
-group methane id > 2300
-dump 1 methane custom 1 outputs/penetrant_$F_$M_$T.xyz id type x y z vx vy vz fx fy fz
+group penetrant id > 2300
+dump 1 penetrant custom 1 outputs/penetrant_$F_$M_$T.xyz id type x y z vx vy vz fx fy fz
 dump 2 all xyz 100 outputs/all_$F_$M_$T.xyz 
 
-variable i loop 10000
-label myfirstloop
+variable natoms equal atoms
 
+
+variable i loop 10000
+
+
+label myfirstloop
 variable s equal step
 create_atoms 0 random 1 $s mobileR mol CH4mol 55
-group methane id > 2300
+group penetrant id > 2300
 
 
-if "${T} == solubility" then "fix 3 methane nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
+if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
+
+velocity all set 0.0 0.0 0.0
+run 0
+minimize 0.0 1.0e-4 1000 10000003
+velocity all set 0.0 0.0 0.0
 
 
+delete_atoms overlap 0.3 mobile penetrant
 
-velocity all create $s 4928459 rot yes dist gaussian
-minimize 0.0 1.0e-8 1000 10002
+print """
+Natoms: ${natoms}
+"""
+
+if "${natoms} < 2305" then "jump SELF jumpError"
 
 
 print """
@@ -129,7 +141,9 @@ run 1000
 print """
 The Jiggling Stopped at Step = $s
 """
-delete_atoms group methane
+
+
+delete_atoms group penetrant
 next i
 jump SELF myfirstloop
 
@@ -139,3 +153,17 @@ Bottom of Gas = $l
 X = $x
 Y = $y
 """
+
+quit
+
+label jumpError
+print """
+Overlapping atoms
+Natoms: ${natoms}
+Step: $s
+"""
+
+delete_atoms group penetrant
+minimize 0.0 1.0e-4 1000 10000003
+run 1
+jump SELF myfirstloop
