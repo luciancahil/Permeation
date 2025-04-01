@@ -85,6 +85,7 @@ label after_logic
 print """
 FILE = $F
 Molecule = $M
+Task = $T
 """
 
 # define ensemble for mobile region
@@ -100,8 +101,8 @@ run 101
 molecule CH4mol molecules/$M
 
 group methane id > 2300
-dump 1 methane custom 1 outputs/methane.xyz id type x y z vx vy vz fx fy fz
-dump 2 all xyz 100 outputs/Details.xyz
+dump 1 methane custom 1 outputs/penetrant_$F_$M_$T.xyz id type x y z vx vy vz fx fy fz
+dump 2 all xyz 100 outputs/all_$F_$M_$T.xyz 
 
 variable i loop 10000
 label myfirstloop
