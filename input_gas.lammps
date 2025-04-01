@@ -38,18 +38,36 @@ variable h equal (zhi)
 variable l equal (zhi+(2*zlo))
 
 # Define output
-thermo 100
+thermo 1000
 thermo_style custom step temp etotal pe ke press vol lx ly lz
+if "${T} == solubility" then "jump SELF do_freeze" elif "${T} == permeation" then "jump SELF do_npt" else "jump SELF do_normal"
 
-# Freeze
-region edgeR block 0 $x 0 $y 0 $z
-group edge region edgeR
-fix 2 edge setforce NULL 0.0 0.0
+label do_freeze
+#Freeze bottom region
+  region edgeR block 0 $x 0 $y 0 $z
+  group edge region edgeR
+  fix 2 edge setforce NULL 0.0 0.0
 
-# Add Wall
-fix xwalls all wall/reflect zlo EDGE zhi EDGE
+# Define the Z 
+  fix zwalls all wall/reflect zlo EDGE zhi EDGE
+  jump SELF after_logic
 
 
+label do_npt
+  fix 3all all npt temp 300.0 300.0 100.0
+  run 10000
+  jump SELF after_logic
+
+
+label do_normal
+  print """
+  Invalid T input
+  """
+
+  quit 
+
+
+label after_logic
 print """
 FILE = $F
 Molecule = $M
