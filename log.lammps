@@ -19,6 +19,7 @@ angle_style harmonic
 dihedral_style opls
 improper_style cvff
 
+read_data data/$F
 read_data data/C92x5x5.data
 Reading data file ...
   orthogonal box = (0 0 -15.176166) to (19.576986 15.176166 91.056996)
@@ -50,8 +51,8 @@ Finding 1-2 1-3 1-4 neighbors ...
      6 = max # of 1-3 neighbors
     12 = max # of 1-4 neighbors
     16 = max # of special neighbors
-  special bonds CPU = 0.002 seconds
-  read_data CPU = 0.052 seconds
+  special bonds CPU = 0.001 seconds
+  read_data CPU = 0.101 seconds
 
 # Set up simulation
 run_style verlet
@@ -82,6 +83,15 @@ fix 2 edge setforce NULL 0.0 0.0
 
 # Add Wall
 fix xwalls all wall/reflect zlo EDGE zhi EDGE
+
+
+print """
+FILE = $F
+Molecule = $M
+"""
+
+FILE = C92x5x5.data
+Molecule = CH4.lmp
 
 
 # define mobile ensemble
@@ -133,9 +143,9 @@ Per MPI rank memory allocation (min/avg/max) = 16.97 | 16.97 | 16.97 Mbytes
          0   0              3430.1645      3430.1645      0             -20907.543      31562.254      19.576986      15.176166      106.23316    
        100   0              232.20952      232.20952      0             -4056.4777      31562.254      19.576986      15.176166      106.23316    
        124   0              226.43089      226.43089      0             -3907.1445      31562.254      19.576986      15.176166      106.23316    
-Loop time of 4.25955 on 1 procs for 124 steps with 2300 atoms
+Loop time of 4.31639 on 1 procs for 124 steps with 2300 atoms
 
-100.3% CPU use with 1 MPI tasks x 1 OpenMP threads
+100.0% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 Minimization stats:
   Stopping criterion = linesearch alpha is zero
@@ -149,13 +159,13 @@ Minimization stats:
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 3.7914     | 3.7914     | 3.7914     |   0.0 | 89.01
-Bond    | 0.4058     | 0.4058     | 0.4058     |   0.0 |  9.53
-Neigh   | 0.037916   | 0.037916   | 0.037916   |   0.0 |  0.89
-Comm    | 0.012868   | 0.012868   | 0.012868   |   0.0 |  0.30
-Output  | 7.0752e-05 | 7.0752e-05 | 7.0752e-05 |   0.0 |  0.00
-Modify  | 0.0012825  | 0.0012825  | 0.0012825  |   0.0 |  0.03
-Other   |            | 0.01017    |            |       |  0.24
+Pair    | 3.8412     | 3.8412     | 3.8412     |   0.0 | 88.99
+Bond    | 0.41172    | 0.41172    | 0.41172    |   0.0 |  9.54
+Neigh   | 0.038892   | 0.038892   | 0.038892   |   0.0 |  0.90
+Comm    | 0.013254   | 0.013254   | 0.013254   |   0.0 |  0.31
+Output  | 5.1507e-05 | 5.1507e-05 | 5.1507e-05 |   0.0 |  0.00
+Modify  | 0.0011997  | 0.0011997  | 0.0011997  |   0.0 |  0.03
+Other   |            | 0.01012    |            |       |  0.23
 
 Nlocal:           2300 ave        2300 max        2300 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -177,21 +187,21 @@ Per MPI rank memory allocation (min/avg/max) = 15.85 | 15.85 | 15.85 Mbytes
        124   0              226.43089      226.43089      0             -3907.1445      31562.254      19.576986      15.176166      106.23316    
        200   0.7895821      228.61916      223.20824      5.4109132     -3870.7936      31562.254      19.576986      15.176166      106.23316    
        224   1.0645594      229.05281      221.75751      7.2953006     -3899.1725      31562.254      19.576986      15.176166      106.23316    
-Loop time of 1.08518 on 1 procs for 100 steps with 2300 atoms
+Loop time of 1.09568 on 1 procs for 100 steps with 2300 atoms
 
-Performance: 7.962 ns/day, 3.014 hours/ns, 92.151 timesteps/s, 211.946 katom-step/s
-99.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 7.886 ns/day, 3.044 hours/ns, 91.267 timesteps/s, 209.915 katom-step/s
+100.0% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.94898    | 0.94898    | 0.94898    |   0.0 | 87.45
-Bond    | 0.12753    | 0.12753    | 0.12753    |   0.0 | 11.75
+Pair    | 0.95798    | 0.95798    | 0.95798    |   0.0 | 87.43
+Bond    | 0.12896    | 0.12896    | 0.12896    |   0.0 | 11.77
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0041706  | 0.0041706  | 0.0041706  |   0.0 |  0.38
-Output  | 8.0651e-05 | 8.0651e-05 | 8.0651e-05 |   0.0 |  0.01
-Modify  | 0.0033466  | 0.0033466  | 0.0033466  |   0.0 |  0.31
-Other   |            | 0.001068   |            |       |  0.10
+Comm    | 0.0042297  | 0.0042297  | 0.0042297  |   0.0 |  0.39
+Output  | 7.429e-05  | 7.429e-05  | 7.429e-05  |   0.0 |  0.01
+Modify  | 0.0033591  | 0.0033591  | 0.0033591  |   0.0 |  0.31
+Other   |            | 0.001081   |            |       |  0.10
 
 Nlocal:           2300 ave        2300 max        2300 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -207,7 +217,8 @@ Neighbor list builds = 0
 Dangerous builds = 0
 
 # Define molecule template
-molecule CH4mol CH4.lmp
+molecule CH4mol molecules/$M
+molecule CH4mol molecules/CH4.lmp
 Read molecule template CH4mol:
 LAMMPS data file Created by LigParGen - (Written by Leela S. Dodda)
   1 molecules
@@ -249,9 +260,9 @@ Per MPI rank memory allocation (min/avg/max) = 17.43 | 17.43 | 17.43 Mbytes
        300   224            1720.1988      181.81462      1538.3841     -1645.4996      31562.254      19.576986      15.176166      106.23316    
        400   224            1663.24        124.85583      1538.3841     -1309.1063      31562.254      19.576986      15.176166      106.23316    
        500   224            1632.1557      93.771526      1538.3841     -1291.5044      31562.254      19.576986      15.176166      106.23316    
-Loop time of 8.80788 on 1 procs for 276 steps with 2305 atoms
+Loop time of 8.88847 on 1 procs for 276 steps with 2305 atoms
 
-99.6% CPU use with 1 MPI tasks x 1 OpenMP threads
+99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 Minimization stats:
   Stopping criterion = linesearch alpha is zero
@@ -265,13 +276,13 @@ Minimization stats:
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 7.7851     | 7.7851     | 7.7851     |   0.0 | 88.39
-Bond    | 0.82148    | 0.82148    | 0.82148    |   0.0 |  9.33
-Neigh   | 0.11626    | 0.11626    | 0.11626    |   0.0 |  1.32
-Comm    | 0.028004   | 0.028004   | 0.028004   |   0.0 |  0.32
-Output  | 0.025857   | 0.025857   | 0.025857   |   0.0 |  0.29
-Modify  | 0.0024975  | 0.0024975  | 0.0024975  |   0.0 |  0.03
-Other   |            | 0.02868    |            |       |  0.33
+Pair    | 7.8585     | 7.8585     | 7.8585     |   0.0 | 88.41
+Bond    | 0.82727    | 0.82727    | 0.82727    |   0.0 |  9.31
+Neigh   | 0.12016    | 0.12016    | 0.12016    |   0.0 |  1.35
+Comm    | 0.026415   | 0.026415   | 0.026415   |   0.0 |  0.30
+Output  | 0.025379   | 0.025379   | 0.025379   |   0.0 |  0.29
+Modify  | 0.0025352  | 0.0025352  | 0.0025352  |   0.0 |  0.03
+Other   |            | 0.02824    |            |       |  0.32
 
 Nlocal:           2305 ave        2305 max        2305 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -309,21 +320,21 @@ Per MPI rank memory allocation (min/avg/max) = 18.76 | 18.76 | 18.76 Mbytes
       1300   291.62367      3766.0675      1763.2585      2002.809      -2444.2402      31562.254      19.576986      15.176166      106.23316    
       1400   287.11126      3683.3316      1711.5128      1971.8188     -1322.2179      31562.254      19.576986      15.176166      106.23316    
       1500   270.26634      3526.9246      1670.7931      1856.1315     -1025.435       31562.254      19.576986      15.176166      106.23316    
-Loop time of 11.8304 on 1 procs for 1000 steps with 2305 atoms
+Loop time of 12.1157 on 1 procs for 1000 steps with 2305 atoms
 
-Performance: 7.303 ns/day, 3.286 hours/ns, 84.528 timesteps/s, 194.837 katom-step/s
-99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 7.131 ns/day, 3.365 hours/ns, 82.537 timesteps/s, 190.248 katom-step/s
+99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 9.9125     | 9.9125     | 9.9125     |   0.0 | 83.79
-Bond    | 1.3077     | 1.3077     | 1.3077     |   0.0 | 11.05
-Neigh   | 0.43569    | 0.43569    | 0.43569    |   0.0 |  3.68
-Comm    | 0.047813   | 0.047813   | 0.047813   |   0.0 |  0.40
-Output  | 0.0712     | 0.0712     | 0.0712     |   0.0 |  0.60
-Modify  | 0.042751   | 0.042751   | 0.042751   |   0.0 |  0.36
-Other   |            | 0.01268    |            |       |  0.11
+Pair    | 10.145     | 10.145     | 10.145     |   0.0 | 83.74
+Bond    | 1.3417     | 1.3417     | 1.3417     |   0.0 | 11.07
+Neigh   | 0.44705    | 0.44705    | 0.44705    |   0.0 |  3.69
+Comm    | 0.048033   | 0.048033   | 0.048033   |   0.0 |  0.40
+Output  | 0.075615   | 0.075615   | 0.075615   |   0.0 |  0.62
+Modify  | 0.045452   | 0.045452   | 0.045452   |   0.0 |  0.38
+Other   |            | 0.01266    |            |       |  0.10
 
 Nlocal:           2305 ave        2305 max        2305 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -336,4 +347,76 @@ Total # of neighbors = 764567
 Ave neighs/atom = 331.69935
 Ave special neighs/atom = 11.548807
 Neighbor list builds = 22
+Dangerous builds = 0
+
+
+print """
+The Jiggling Stopped at Step = $s
+"""
+
+The Jiggling Stopped at Step = 1500
+
+delete_atoms group methane
+WARNING: Ignoring 'compress yes' for molecular system (src/delete_atoms.cpp:141)
+Deleted 5 atoms, new total = 2300
+next i
+jump SELF myfirstloop
+
+variable s equal step
+create_atoms 0 random 1 $s mobileR mol CH4mol 55
+create_atoms 0 random 1 1500 mobileR mol CH4mol 55
+Created 5 atoms
+  using lattice units in orthogonal box = (0 0 -15.176166) to (19.576986 15.176166 91.056996)
+  create_atoms CPU = 0.000 seconds
+group methane id > 2300
+5 atoms in group methane
+
+fix 3 methane nvt temp 300.0 300.0 100.0
+
+
+velocity all create $s 4928459 rot yes dist gaussian
+velocity all create 1500 4928459 rot yes dist gaussian
+minimize 0.0 1.0e-8 1000 10000
+Generated 1 of 1 mixed pair_coeff terms from arithmetic mixing rule
+WARNING: Inconsistent image flags (src/domain.cpp:1051)
+Per MPI rank memory allocation (min/avg/max) = 19.88 | 19.88 | 19.88 Mbytes
+   Step          Temp          TotEng         PotEng         KinEng         Press          Volume           Lx             Ly             Lz      
+      1500   1500           35882.572      25580.892      10301.68       219671.98      31562.254      19.576986      15.176166      106.23316    
+      1600   1500           10472.308      170.62848      10301.68       11471.936      31562.254      19.576986      15.176166      106.23316    
+      1692   1500           10449.697      148.01774      10301.68       11393.124      31562.254      19.576986      15.176166      106.23316    
+Loop time of 6.56312 on 1 procs for 192 steps with 2305 atoms
+
+99.1% CPU use with 1 MPI tasks x 1 OpenMP threads
+
+Minimization stats:
+  Stopping criterion = linesearch alpha is zero
+  Energy initial, next-to-last, final = 
+      25580.8920410085   148.017744632685   148.017744632685
+  Force two-norm initial, final = 240917.47 14.749495
+  Force max component initial, final = 107603.6 1.4153658
+  Final line search alpha, max atom move = 3.6386446e-11 5.1500131e-11
+  Iterations, force evaluations = 192 427
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 5.8165     | 5.8165     | 5.8165     |   0.0 | 88.62
+Bond    | 0.60131    | 0.60131    | 0.60131    |   0.0 |  9.16
+Neigh   | 0.081252   | 0.081252   | 0.081252   |   0.0 |  1.24
+Comm    | 0.019954   | 0.019954   | 0.019954   |   0.0 |  0.30
+Output  | 0.019637   | 0.019637   | 0.019637   |   0.0 |  0.30
+Modify  | 0.0020321  | 0.0020321  | 0.0020321  |   0.0 |  0.03
+Other   |            | 0.02243    |            |       |  0.34
+
+Nlocal:           2305 ave        2305 max        2305 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Nghost:          10924 ave       10924 max       10924 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+Neighs:         768797 ave      768797 max      768797 min
+Histogram: 1 0 0 0 0 0 0 0 0 0
+
+Total # of neighbors = 768797
+Ave neighs/atom = 333.53449
+Ave special neighs/atom = 11.548807
+Neighbor list builds = 4
 Dangerous builds = 0

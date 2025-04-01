@@ -1,5 +1,10 @@
 # LAMMPS Input Script
 
+# command to run:
+# lmp -var F C92x5x5.data -var M CH4.lmp -i input_gas.lammps
+
+# F is file, M is molecule
+
 units real
 atom_style full
 
@@ -16,7 +21,7 @@ angle_style harmonic
 dihedral_style opls
 improper_style cvff
 
-read_data data/C92x5x5.data
+read_data data/$F
 
 # Set up simulation
 run_style verlet
@@ -45,6 +50,11 @@ fix 2 edge setforce NULL 0.0 0.0
 fix xwalls all wall/reflect zlo EDGE zhi EDGE
 
 
+print """
+FILE = $F
+Molecule = $M
+"""
+
 # define mobile ensemble
 region mobileR block 0 $x 0 $y $z $h
 group mobile region mobileR
@@ -54,7 +64,7 @@ minimize 0.0 1.0e-8 1000 100000
 run 100
 
 # Define molecule template
-molecule CH4mol CH4.lmp
+molecule CH4mol molecules/$M
 
 group methane id > 2300
 dump 1 methane custom 1 methane.xyz id type x y z vx vy vz fx fy fz
