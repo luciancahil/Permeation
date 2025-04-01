@@ -10,7 +10,8 @@ atom_style full
 
 # create a box first
 # include vacuum in the x and y, z should be fixed.
-boundary p p f
+
+if "${T} == solubility" then "boundary p p f" elif "${T} == diffusion" "boundary p p p" else "jump SELF do_normal"
 
 # no kspace
 # Define force field parameters
@@ -40,7 +41,7 @@ variable l equal (zhi+(2*zlo))
 # Define output
 thermo 1000
 thermo_style custom step temp etotal pe ke press vol lx ly lz
-if "${T} == solubility" then "jump SELF do_freeze" elif "${T} == diffusion" then "jump SELF do_npt" else "jump SELF do_normal"
+if "${T} == solubility" then "jump SELF do_freeze" elif "${T} == diffusion" "jump SELF do_npt" else "jump SELF do_normal"
 
 label do_freeze
 #Freeze bottom region
@@ -57,10 +58,18 @@ label do_freeze
   jump SELF after_logic
 
 label do_npt
-  fix 3all all npt temp 300.0 300.0 100.0
-  run 10000
+  fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
+  run 10
    # define mobile ensemble
-  region mobileR block xlo xhi ylo yhi zlo zhi
+  variable xl equal xlo
+  variable xh equal xhi
+  variable yl equal ylo
+  variable yh equal yhi 
+  variable zl equal zlo
+  variable zh equal zhi
+
+  unfix 3all
+  region mobileR block ${xl} ${xh} ${yl} ${yh} ${zl} ${zh}
   jump SELF after_logic
 
 
@@ -80,17 +89,19 @@ Molecule = $M
 
 # define ensemble for mobile region
 group mobile region mobileR
-fix 1 mobile nvt temp 300.0 300.0 100.0
 
-minimize 0.0 1.0e-8 1000 100000
-run 100
+if "${T} == solubility" then "fix 1 mobile nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
+
+
+minimize 0.0 1.0e-8 1000 100001
+run 101
 
 # Define molecule template
 molecule CH4mol molecules/$M
 
 group methane id > 2300
-dump 1 methane custom 1 methane.xyz id type x y z vx vy vz fx fy fz
-dump 2 all xyz 100 Details.xyz
+dump 1 methane custom 1 outputs/methane.xyz id type x y z vx vy vz fx fy fz
+dump 2 all xyz 100 outputs/Details.xyz
 
 variable i loop 10000
 label myfirstloop
@@ -99,11 +110,13 @@ variable s equal step
 create_atoms 0 random 1 $s mobileR mol CH4mol 55
 group methane id > 2300
 
-fix 3 methane nvt temp 300.0 300.0 100.0
+
+if "${T} == solubility" then "fix 3 methane nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
+
 
 
 velocity all create $s 4928459 rot yes dist gaussian
-minimize 0.0 1.0e-8 1000 10000
+minimize 0.0 1.0e-8 1000 10002
 
 
 print """
