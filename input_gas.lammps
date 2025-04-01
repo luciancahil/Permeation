@@ -40,7 +40,7 @@ variable l equal (zhi+(2*zlo))
 # Define output
 thermo 1000
 thermo_style custom step temp etotal pe ke press vol lx ly lz
-if "${T} == solubility" then "jump SELF do_freeze" elif "${T} == permeation" then "jump SELF do_npt" else "jump SELF do_normal"
+if "${T} == solubility" then "jump SELF do_freeze" elif "${T} == diffusion" then "jump SELF do_npt" else "jump SELF do_normal"
 
 label do_freeze
 #Freeze bottom region
@@ -50,12 +50,17 @@ label do_freeze
 
 # Define the Z 
   fix zwalls all wall/reflect zlo EDGE zhi EDGE
-  jump SELF after_logic
 
+  # define mobile region
+  region mobileR block 0 $x 0 $y $z $h
+
+  jump SELF after_logic
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0
   run 10000
+   # define mobile ensemble
+  region mobileR block xlo xhi ylo yhi zlo zhi
   jump SELF after_logic
 
 
@@ -73,8 +78,7 @@ FILE = $F
 Molecule = $M
 """
 
-# define mobile ensemble
-region mobileR block 0 $x 0 $y $z $h
+# define ensemble for mobile region
 group mobile region mobileR
 fix 1 mobile nvt temp 300.0 300.0 100.0
 

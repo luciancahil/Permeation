@@ -57,7 +57,7 @@ Finding 1-2 1-3 1-4 neighbors ...
     12 = max # of 1-4 neighbors
     16 = max # of special neighbors
   special bonds CPU = 0.002 seconds
-  read_data CPU = 0.053 seconds
+  read_data CPU = 0.057 seconds
 
 # Set up simulation
 run_style verlet
@@ -76,7 +76,7 @@ variable l equal (zhi+(2*zlo))
 # Define output
 thermo 1000
 thermo_style custom step temp etotal pe ke press vol lx ly lz
-if "${T} == solubility" then "jump SELF do_freeze" elif "${T} == permeation" then "jump SELF do_npt" else "jump SELF do_normal"
+if "${T} == solubility" then "jump SELF do_freeze" elif "${T} == diffusion" then "jump SELF do_npt" else "jump SELF do_normal"
 jump SELF do_freeze
 #Freeze bottom region
   region edgeR block 0 $x 0 $y 0 $z
@@ -89,6 +89,14 @@ jump SELF do_freeze
 
 # Define the Z
   fix zwalls all wall/reflect zlo EDGE zhi EDGE
+
+  # define mobile region
+  region mobileR block 0 $x 0 $y $z $h
+  region mobileR block 0 19.576986 0 $y $z $h
+  region mobileR block 0 19.576986 0 15.176166 $z $h
+  region mobileR block 0 19.576986 0 15.176166 15.176166 $h
+  region mobileR block 0 19.576986 0 15.176166 15.176166 91.056996
+
   jump SELF after_logic
 print """
 FILE = $F
@@ -99,12 +107,7 @@ FILE = C92x5x5.data
 Molecule = CH4.lmp
 
 
-# define mobile ensemble
-region mobileR block 0 $x 0 $y $z $h
-region mobileR block 0 19.576986 0 $y $z $h
-region mobileR block 0 19.576986 0 15.176166 $z $h
-region mobileR block 0 19.576986 0 15.176166 15.176166 $h
-region mobileR block 0 19.576986 0 15.176166 15.176166 91.056996
+# define ensemble for mobile region
 group mobile region mobileR
 1704 atoms in group mobile
 fix 1 mobile nvt temp 300.0 300.0 100.0
@@ -147,9 +150,9 @@ Per MPI rank memory allocation (min/avg/max) = 16.97 | 16.97 | 16.97 Mbytes
    Step          Temp          TotEng         PotEng         KinEng         Press          Volume           Lx             Ly             Lz      
          0   0              3430.1645      3430.1645      0             -20907.543      31562.254      19.576986      15.176166      106.23316    
        124   0              226.43089      226.43089      0             -3907.1445      31562.254      19.576986      15.176166      106.23316    
-Loop time of 4.30226 on 1 procs for 124 steps with 2300 atoms
+Loop time of 4.31825 on 1 procs for 124 steps with 2300 atoms
 
-105.9% CPU use with 1 MPI tasks x 1 OpenMP threads
+104.1% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 Minimization stats:
   Stopping criterion = linesearch alpha is zero
@@ -163,13 +166,13 @@ Minimization stats:
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 3.8339     | 3.8339     | 3.8339     |   0.0 | 89.11
-Bond    | 0.40719    | 0.40719    | 0.40719    |   0.0 |  9.46
-Neigh   | 0.03806    | 0.03806    | 0.03806    |   0.0 |  0.88
-Comm    | 0.012261   | 0.012261   | 0.012261   |   0.0 |  0.28
+Pair    | 3.8427     | 3.8427     | 3.8427     |   0.0 | 88.99
+Bond    | 0.41263    | 0.41263    | 0.41263    |   0.0 |  9.56
+Neigh   | 0.038595   | 0.038595   | 0.038595   |   0.0 |  0.89
+Comm    | 0.012974   | 0.012974   | 0.012974   |   0.0 |  0.30
 Output  | 0          | 0          | 0          |   0.0 |  0.00
-Modify  | 0.0011728  | 0.0011728  | 0.0011728  |   0.0 |  0.03
-Other   |            | 0.009696   |            |       |  0.23
+Modify  | 0.0012385  | 0.0012385  | 0.0012385  |   0.0 |  0.03
+Other   |            | 0.01014    |            |       |  0.23
 
 Nlocal:           2300 ave        2300 max        2300 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -190,21 +193,21 @@ Per MPI rank memory allocation (min/avg/max) = 15.85 | 15.85 | 15.85 Mbytes
    Step          Temp          TotEng         PotEng         KinEng         Press          Volume           Lx             Ly             Lz      
        124   0              226.43089      226.43089      0             -3907.1445      31562.254      19.576986      15.176166      106.23316    
        224   1.0645594      229.05281      221.75751      7.2953006     -3899.1725      31562.254      19.576986      15.176166      106.23316    
-Loop time of 1.10403 on 1 procs for 100 steps with 2300 atoms
+Loop time of 1.14205 on 1 procs for 100 steps with 2300 atoms
 
-Performance: 7.826 ns/day, 3.067 hours/ns, 90.577 timesteps/s, 208.327 katom-step/s
-99.5% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 7.565 ns/day, 3.172 hours/ns, 87.562 timesteps/s, 201.392 katom-step/s
+99.2% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 0.96546    | 0.96546    | 0.96546    |   0.0 | 87.45
-Bond    | 0.12982    | 0.12982    | 0.12982    |   0.0 | 11.76
+Pair    | 0.99451    | 0.99451    | 0.99451    |   0.0 | 87.08
+Bond    | 0.13668    | 0.13668    | 0.13668    |   0.0 | 11.97
 Neigh   | 0          | 0          | 0          |   0.0 |  0.00
-Comm    | 0.0040545  | 0.0040545  | 0.0040545  |   0.0 |  0.37
-Output  | 3.3253e-05 | 3.3253e-05 | 3.3253e-05 |   0.0 |  0.00
-Modify  | 0.0036009  | 0.0036009  | 0.0036009  |   0.0 |  0.33
-Other   |            | 0.001071   |            |       |  0.10
+Comm    | 0.0055244  | 0.0055244  | 0.0055244  |   0.0 |  0.48
+Output  | 3.9219e-05 | 3.9219e-05 | 3.9219e-05 |   0.0 |  0.00
+Modify  | 0.0039012  | 0.0039012  | 0.0039012  |   0.0 |  0.34
+Other   |            | 0.001398   |            |       |  0.12
 
 Nlocal:           2300 ave        2300 max        2300 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -261,9 +264,9 @@ Per MPI rank memory allocation (min/avg/max) = 17.43 | 17.43 | 17.43 Mbytes
    Step          Temp          TotEng         PotEng         KinEng         Press          Volume           Lx             Ly             Lz      
        224   224            1759.2055      220.82135      1538.3841     -1690.8526      31562.254      19.576986      15.176166      106.23316    
        500   224            1632.1557      93.771526      1538.3841     -1291.5044      31562.254      19.576986      15.176166      106.23316    
-Loop time of 8.94252 on 1 procs for 276 steps with 2305 atoms
+Loop time of 8.92335 on 1 procs for 276 steps with 2305 atoms
 
-99.4% CPU use with 1 MPI tasks x 1 OpenMP threads
+99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 Minimization stats:
   Stopping criterion = linesearch alpha is zero
@@ -277,13 +280,13 @@ Minimization stats:
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 7.9028     | 7.9028     | 7.9028     |   0.0 | 88.37
-Bond    | 0.83436    | 0.83436    | 0.83436    |   0.0 |  9.33
-Neigh   | 0.11827    | 0.11827    | 0.11827    |   0.0 |  1.32
-Comm    | 0.028932   | 0.028932   | 0.028932   |   0.0 |  0.32
-Output  | 0.026405   | 0.026405   | 0.026405   |   0.0 |  0.30
-Modify  | 0.0027201  | 0.0027201  | 0.0027201  |   0.0 |  0.03
-Other   |            | 0.02904    |            |       |  0.32
+Pair    | 7.8874     | 7.8874     | 7.8874     |   0.0 | 88.39
+Bond    | 0.83145    | 0.83145    | 0.83145    |   0.0 |  9.32
+Neigh   | 0.11836    | 0.11836    | 0.11836    |   0.0 |  1.33
+Comm    | 0.027781   | 0.027781   | 0.027781   |   0.0 |  0.31
+Output  | 0.026622   | 0.026622   | 0.026622   |   0.0 |  0.30
+Modify  | 0.002641   | 0.002641   | 0.002641   |   0.0 |  0.03
+Other   |            | 0.0291     |            |       |  0.33
 
 Nlocal:           2305 ave        2305 max        2305 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -313,21 +316,21 @@ Per MPI rank memory allocation (min/avg/max) = 18.76 | 18.76 | 18.76 Mbytes
        500   224            1632.1557      93.771526      1538.3841     -1291.5044      31562.254      19.576986      15.176166      106.23316    
       1000   247.22885      3135.3978      1437.4828      1697.9149     -2932.1125      31562.254      19.576986      15.176166      106.23316    
       1500   270.26634      3526.9246      1670.7931      1856.1315     -1025.435       31562.254      19.576986      15.176166      106.23316    
-Loop time of 11.9185 on 1 procs for 1000 steps with 2305 atoms
+Loop time of 11.9358 on 1 procs for 1000 steps with 2305 atoms
 
-Performance: 7.249 ns/day, 3.311 hours/ns, 83.903 timesteps/s, 193.397 katom-step/s
-99.7% CPU use with 1 MPI tasks x 1 OpenMP threads
+Performance: 7.239 ns/day, 3.315 hours/ns, 83.782 timesteps/s, 193.117 katom-step/s
+99.3% CPU use with 1 MPI tasks x 1 OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 9.9815     | 9.9815     | 9.9815     |   0.0 | 83.75
-Bond    | 1.3225     | 1.3225     | 1.3225     |   0.0 | 11.10
-Neigh   | 0.43862    | 0.43862    | 0.43862    |   0.0 |  3.68
-Comm    | 0.048025   | 0.048025   | 0.048025   |   0.0 |  0.40
-Output  | 0.071331   | 0.071331   | 0.071331   |   0.0 |  0.60
-Modify  | 0.04305    | 0.04305    | 0.04305    |   0.0 |  0.36
-Other   |            | 0.01342    |            |       |  0.11
+Pair    | 10.002     | 10.002     | 10.002     |   0.0 | 83.80
+Bond    | 1.3178     | 1.3178     | 1.3178     |   0.0 | 11.04
+Neigh   | 0.43992    | 0.43992    | 0.43992    |   0.0 |  3.69
+Comm    | 0.046006   | 0.046006   | 0.046006   |   0.0 |  0.39
+Output  | 0.073752   | 0.073752   | 0.073752   |   0.0 |  0.62
+Modify  | 0.043934   | 0.043934   | 0.043934   |   0.0 |  0.37
+Other   |            | 0.01266    |            |       |  0.11
 
 Nlocal:           2305 ave        2305 max        2305 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
@@ -340,75 +343,4 @@ Total # of neighbors = 764567
 Ave neighs/atom = 331.69935
 Ave special neighs/atom = 11.548807
 Neighbor list builds = 22
-Dangerous builds = 0
-
-
-print """
-The Jiggling Stopped at Step = $s
-"""
-
-The Jiggling Stopped at Step = 1500
-
-delete_atoms group methane
-WARNING: Ignoring 'compress yes' for molecular system (src/delete_atoms.cpp:141)
-Deleted 5 atoms, new total = 2300
-next i
-jump SELF myfirstloop
-
-variable s equal step
-create_atoms 0 random 1 $s mobileR mol CH4mol 55
-create_atoms 0 random 1 1500 mobileR mol CH4mol 55
-Created 5 atoms
-  using lattice units in orthogonal box = (0 0 -15.176166) to (19.576986 15.176166 91.056996)
-  create_atoms CPU = 0.000 seconds
-group methane id > 2300
-5 atoms in group methane
-
-fix 3 methane nvt temp 300.0 300.0 100.0
-
-
-velocity all create $s 4928459 rot yes dist gaussian
-velocity all create 1500 4928459 rot yes dist gaussian
-minimize 0.0 1.0e-8 1000 10000
-Generated 1 of 1 mixed pair_coeff terms from arithmetic mixing rule
-WARNING: Inconsistent image flags (src/domain.cpp:1051)
-Per MPI rank memory allocation (min/avg/max) = 19.88 | 19.88 | 19.88 Mbytes
-   Step          Temp          TotEng         PotEng         KinEng         Press          Volume           Lx             Ly             Lz      
-      1500   1500           35882.572      25580.892      10301.68       219671.98      31562.254      19.576986      15.176166      106.23316    
-      1692   1500           10449.697      148.01774      10301.68       11393.124      31562.254      19.576986      15.176166      106.23316    
-Loop time of 6.3644 on 1 procs for 192 steps with 2305 atoms
-
-99.6% CPU use with 1 MPI tasks x 1 OpenMP threads
-
-Minimization stats:
-  Stopping criterion = linesearch alpha is zero
-  Energy initial, next-to-last, final = 
-      25580.8920410085   148.017744632685   148.017744632685
-  Force two-norm initial, final = 240917.47 14.749495
-  Force max component initial, final = 107603.6 1.4153658
-  Final line search alpha, max atom move = 3.6386446e-11 5.1500131e-11
-  Iterations, force evaluations = 192 427
-
-MPI task timing breakdown:
-Section |  min time  |  avg time  |  max time  |%varavg| %total
----------------------------------------------------------------
-Pair    | 5.6471     | 5.6471     | 5.6471     |   0.0 | 88.73
-Bond    | 0.57834    | 0.57834    | 0.57834    |   0.0 |  9.09
-Neigh   | 0.079688   | 0.079688   | 0.079688   |   0.0 |  1.25
-Comm    | 0.018122   | 0.018122   | 0.018122   |   0.0 |  0.28
-Output  | 0.017732   | 0.017732   | 0.017732   |   0.0 |  0.28
-Modify  | 0.0019946  | 0.0019946  | 0.0019946  |   0.0 |  0.03
-Other   |            | 0.02145    |            |       |  0.34
-
-Nlocal:           2305 ave        2305 max        2305 min
-Histogram: 1 0 0 0 0 0 0 0 0 0
-Nghost:          10924 ave       10924 max       10924 min
-Histogram: 1 0 0 0 0 0 0 0 0 0
-Neighs:         768797 ave      768797 max      768797 min
-Histogram: 1 0 0 0 0 0 0 0 0 0
-
-Total # of neighbors = 768797
-Ave neighs/atom = 333.53449
-Ave special neighs/atom = 11.548807
-Neighbor list builds = 4
 Dangerous builds = 0
