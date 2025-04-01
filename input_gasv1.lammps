@@ -1,0 +1,156 @@
+# LAMMPS Input Script
+
+units real
+atom_style full
+
+# create a box first
+# include vacuum in the x and y, z should be fixed.
+boundary p p p
+
+# no kspace
+# Define force field parameters
+pair_style lj/charmm/coul/charmm 8.0 10.0 8.0 10.0
+
+bond_style harmonic
+angle_style harmonic
+dihedral_style opls
+improper_style cvff
+
+read_data C92x5x5.data
+
+# Set up simulation
+run_style verlet
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+
+variable z equal (-1*zlo)
+variable x equal xhi
+variable y equal yhi
+
+# the limits of where we can teleport the gas molecule
+variable h equal (zhi)
+variable l equal (zhi+(2*zlo))
+
+# Define output
+thermo 100
+thermo_style custom step temp etotal pe ke press vol lx ly lz
+
+# Freeze
+region edgeR block 0 $x 0 $y 0 $z
+group edge region edgeR
+fix 2 edge setforce NULL 0.0 0.0
+
+# define mobile ensemble
+region mobileR block 0 $x 0 $y $z $h
+group mobile region mobileR
+fix 1 mobile nvt temp 300.0 300.0 100.0
+
+minimize 0.0 1.0e-8 1000 100000
+run 10000
+
+# Define molecule template
+molecule CH4mol CH4.lmp
+
+group methane id > 2300
+dump 1 methane custom 1 methane.xyz id type x y z vx vy vz fx fy fz
+
+variable i loop 10000
+label myfirstloop
+
+create_atoms 0 random 1 2804 mobileR mol CH4mol 55
+group methane id > 2300
+
+fix 3 methane nvt temp 300.0 300.0 100.0
+
+minimize 0.0 1.0e-8 1000 10000
+run 1000
+
+delete_atoms group methane
+next i
+jump SELF myfirstloop
+
+print """
+Top of Gas = $h
+Bottom of Gas = $l
+X = $x
+Y = $y
+"""
+# LAMMPS Input Script
+
+units real
+atom_style full
+
+# create a box first
+# include vacuum in the x and y, z should be fixed.
+boundary p p p
+
+# no kspace
+# Define force field parameters
+pair_style lj/charmm/coul/charmm 8.0 10.0 8.0 10.0
+
+bond_style harmonic
+angle_style harmonic
+dihedral_style opls
+improper_style cvff
+
+read_data C92x5x5.data
+
+# Set up simulation
+run_style verlet
+neighbor 2.0 bin
+neigh_modify delay 0 every 1 check yes
+
+
+variable z equal (-1*zlo)
+variable x equal xhi
+variable y equal yhi
+
+# the limits of where we can teleport the gas molecule
+variable h equal (zhi)
+variable l equal (zhi+(2*zlo))
+
+# Define output
+thermo 100
+thermo_style custom step temp etotal pe ke press vol lx ly lz
+
+# Freeze
+region edgeR block 0 $x 0 $y 0 $z
+group edge region edgeR
+fix 2 edge setforce NULL 0.0 0.0
+
+# define mobile ensemble
+region mobileR block 0 $x 0 $y $z $h
+group mobile region mobileR
+fix 1 mobile nvt temp 300.0 300.0 100.0
+
+minimize 0.0 1.0e-8 1000 100000
+run 10000
+
+# Define molecule template
+molecule CH4mol CH4.lmp
+
+group methane id > 2300
+dump 1 methane custom 1 methane.xyz id type x y z vx vy vz fx fy fz
+
+variable i loop 10000
+label myfirstloop
+
+create_atoms 0 random 1 2804 mobileR mol CH4mol 55
+group methane id > 2300
+
+fix 3 methane nvt temp 300.0 300.0 100.0
+
+minimize 0.0 1.0e-8 1000 10000
+run 1000
+
+delete_atoms group methane
+next i
+jump SELF myfirstloop
+
+print """
+Top of Gas = $h
+Bottom of Gas = $l
+X = $x
+Y = $y
+"""
