@@ -12,8 +12,8 @@ LAMMPS data output Created by a python Script - (Written by Roy He)
      2 dihedral types
      1 improper types
 
-  0   19.576986 xlo xhi
-  0   15.176166 ylo yhi
+  0   19.7 xlo xhi
+  0   15.2 ylo yhi
   -15.176166   91.056996 zlo zhi
 
 Masses

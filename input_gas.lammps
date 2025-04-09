@@ -4,9 +4,12 @@
 # lmp -var F C92x5x5.data -var M CH4.lmp -var T solubility -i input_gas.lammps
 # F is file, M is molecule
 
+processors 1 1 1
 units real
 atom_style full
 
+# https://matsci.org/t/problem-with-bond-or-angle-atom-missing/43467/29. Really buried the lede there, jeez.
+timestep 0.25
 # create a box first
 # include vacuum in the x and y, z should be fixed.
 
@@ -111,19 +114,20 @@ variable i loop 10000
 
 label myfirstloop
 variable s equal step
-create_atoms 0 random 1 $s mobileR mol CH4mol 55
+create_atoms 0 random 1 $s mobileR mol CH4mol 55 overlap 0.3 maxtry 5000
 group penetrant id > 2300
+
 
 
 if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
 
-velocity all set 0.0 0.0 0.0
-run 0
+
+
+write_data outputs/checkpoint_$F_$M_$T.xyz 
 minimize 0.0 1.0e-4 1000 10000003
 velocity all set 0.0 0.0 0.0
 
-
-delete_atoms overlap 0.3 mobile penetrant
+delete_atoms overlap 0.3 all all
 
 print """
 Natoms: ${natoms}
@@ -141,6 +145,7 @@ run 1000
 print """
 The Jiggling Stopped at Step = $s
 """
+minimize 0.0 1.0e-4 1000 10000004
 
 
 delete_atoms group penetrant
