@@ -116,7 +116,7 @@ label myfirstloop
 variable s equal step
 create_atoms 0 random 1 $s mobileR mol CH4mol 55 overlap 0.3 maxtry 5000
 group penetrant id > 2300
-
+variable expected equal ${natoms}
 
 
 if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
@@ -131,9 +131,10 @@ delete_atoms overlap 0.3 all all
 
 print """
 Natoms: ${natoms}
+Expectd: ${expected}
 """
 
-if "${natoms} < 2302" then "jump SELF jumpError"
+if "${natoms} < ${expected}" then "jump SELF jumpError"
 
 
 print """
