@@ -1,7 +1,10 @@
 # LAMMPS Input Script
 
 # command to run:
-# lmp -var F C92x5x5.data -var M H2.lmp -var T solubility -i input_gas.lammps
+# lmp -var F C92x5x5.data -var M H2.lmp -var T solubility -var NM 1 -i input_gas.lammps
+
+# lmp -var F C92x5x5.data -var M H2.lmp -var M2 CH4.lmp -var T solubility -var NM 2 -i input_gas.lammps
+
 # F is file, M is molecule
 
 processors 1 1 1
@@ -86,7 +89,7 @@ label do_normal
 label after_logic
 print """
 FILE = $F
-Molecule = $M
+Molecule_labe = $M
 Task = $T
 """
 
@@ -100,11 +103,19 @@ minimize 0.0 1.0e-8 1000 100001
 run 101
 
 # Define molecule template
-molecule CH4mol molecules/$M
+molecule penetrantMol molecules/$M
+
+if "${NM} == 1" then "jump SELF done_gen"
+
+molecule penetrantMol2 molecules/${M2}
+
+
+label done_gen
+
 
 group penetrant id > 2300
-dump 1 penetrant custom 1 outputs/penetrant_$F_$M_$T.xyz id type x y z vx vy vz fx fy fz
-dump 2 all xyz 100 outputs/all_$F_$M_$T.xyz 
+dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_$T.xyz id type x y z vx vy vz fx fy fz mol
+dump 2 all xyz 100 outputs/all_$F_$M_${NM}_$T.xyz 
 
 variable natoms equal atoms
 
@@ -114,7 +125,13 @@ variable i loop 10000
 
 label myfirstloop
 variable s equal step
-create_atoms 0 random 1 $s mobileR mol CH4mol 55 overlap 0.3 maxtry 5000
+
+create_atoms 0 random 1 $s mobileR mol penetrantMol 55 overlap 0.3 maxtry 5000
+
+if "${NM} == 1" then "jump SELF done_create"
+create_atoms 0 random 1 $s mobileR mol penetrantMol2 55 overlap 0.3 maxtry 5000
+
+label done_create
 group penetrant id > 2300
 variable expected equal ${natoms}
 
@@ -123,7 +140,7 @@ if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "
 
 
 
-write_data outputs/checkpoint_$F_$M_$T.xyz 
+write_data outputs/checkpoint_$F_$M_${NM}_$T.xyz 
 minimize 0.0 1.0e-4 1000 10000003
 velocity all set 0.0 0.0 0.0
 
