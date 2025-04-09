@@ -44,14 +44,13 @@ def plot_hist(list, name):
     plt.close()
 
 
-log_file = open("diffuse.txt", mode='r')
+log_file = open("./logs/diffuse.txt", mode='r')
 
 coord_file = open("./outputs/penetrant_C92x5x5.data_CH4.lmp_diffusion.xyz")
 
 minimization_stoppages = []
 
 jiggling_stopping_steps = []
-
 
 
 
@@ -94,6 +93,7 @@ while(line):
     line = coord_file.readline()
 
 
+breakpoint()
 x_coords = []
 y_coords = []
 z_coords = []

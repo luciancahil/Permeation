@@ -2,5 +2,7 @@ outputs/
 pics/*
 !pics/dummy.txt
 
+logs/*
+!logs/dummy.txt
 
 log.lammps
