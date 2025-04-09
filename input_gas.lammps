@@ -1,7 +1,7 @@
 # LAMMPS Input Script
 
 # command to run:
-# lmp -var F C92x5x5.data -var M CH4.lmp -var T solubility -i input_gas.lammps
+# lmp -var F C92x5x5.data -var M H2.lmp -var T solubility -i input_gas.lammps
 # F is file, M is molecule
 
 processors 1 1 1
@@ -133,7 +133,7 @@ print """
 Natoms: ${natoms}
 """
 
-if "${natoms} < 2305" then "jump SELF jumpError"
+if "${natoms} < 2302" then "jump SELF jumpError"
 
 
 print """
