@@ -64,7 +64,7 @@ label do_freeze
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 10000000
+  run 100000
    # define mobile ensemble
   variable xl equal xlo
   variable xh equal xhi
@@ -139,8 +139,7 @@ variable expected equal ${natoms}
 if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
 
 
-
-minimize 0.0 1.0e-4 1000 10000003
+minimize 0.0 1.0e-4 1000 100003
 velocity all set 0.0 0.0 0.0
 
 delete_atoms overlap 0.3 all all
@@ -162,7 +161,7 @@ run 1000
 print """
 The Jiggling Stopped at Step = $s
 """
-minimize 0.0 1.0e-4 1000 10000004
+minimize 0.0 1.0e-4 1000 100004
 
 
 delete_atoms group penetrant
