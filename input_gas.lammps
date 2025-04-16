@@ -140,7 +140,6 @@ if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "
 
 
 
-write_data outputs/checkpoint_$F_$M_${NM}_$T.xyz 
 minimize 0.0 1.0e-4 1000 10000003
 velocity all set 0.0 0.0 0.0
 
