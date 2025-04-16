@@ -46,7 +46,7 @@ def plot_hist(list, name):
 
 log_file = open("./logs/diffuse.txt", mode='r')
 
-coord_file = open("./outputs/penetrant_C92x5x5.data_CH4.lmp_diffusion.xyz")
+coord_file = open("./outputs/permanent/penetrant_C92x5x5.data_CH4.lmp_diffusion.xyz")
 
 minimization_stoppages = []
 
@@ -125,9 +125,9 @@ for cycle in cycles_info:
         z_diff.append(round[2] - prev_step[2])
     
 
-    x_diff = [num * num/2 for num in x_diff if abs(num) < box_lenths[0] / 2]
-    y_diff = [num * num/2 for num in y_diff if abs(num) < box_lenths[1] / 2]
-    z_diff = [num * num/2 for num in z_diff if abs(num) < box_lenths[2] / 2]
+    x_diff = [num for num in x_diff if abs(num) < box_lenths[0] / 2]
+    y_diff = [num for num in y_diff if abs(num) < box_lenths[1] / 2]
+    z_diff = [num for num in z_diff if abs(num) < box_lenths[2] / 2]
 
     if(x_diff == [] or y_diff == [] or z_diff == []):
         continue
@@ -157,9 +157,13 @@ plot_hist(x_coords, "x_coords")
 plot_hist(y_coords, "y_coords")
 plot_hist(z_coords, "z_coords")
 
+avg_x = sum(x_MSD) / len(x_MSD)
+avg_y = sum(y_MSD) / len(y_MSD)
+avg_z = sum(z_MSD) / len(z_MSD)
 
-print("X Diffusion Coef: {}".format(sum(x_MSD)/len(x_MSD)))
-print("Y Diffusion Coef: {}".format(sum(y_MSD)/len(y_MSD)))
-print("Z Diffusion Coef: {}".format(sum(z_MSD)/len(z_MSD)))
+
+print("X Diffusion Coef: {}".format(avg_x * avg_x / 2))
+print("Y Diffusion Coef: {}".format(avg_y * avg_y / 2))
+print("Z Diffusion Coef: {}".format(avg_z * avg_z / 2))
 
 print("Done!")

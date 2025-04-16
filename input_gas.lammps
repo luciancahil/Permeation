@@ -12,7 +12,7 @@ units real
 atom_style full
 
 # https://matsci.org/t/problem-with-bond-or-angle-atom-missing/43467/29. Really buried the lede there, jeez.
-timestep 0.25
+# timestep 0.25
 # create a box first
 # include vacuum in the x and y, z should be fixed.
 
@@ -64,7 +64,7 @@ label do_freeze
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 100000
+  run 10000000
    # define mobile ensemble
   variable xl equal xlo
   variable xh equal xhi
