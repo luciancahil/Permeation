@@ -168,8 +168,9 @@ dump 2 all xyz 100 outputs/all_$F_$M_${NM}_$T.xyz
 
 variable natoms equal atoms
 
+variable num_loops equal 10000
 
-variable i loop 10000
+variable i loop ${num_loops}
 
 
 label myfirstloop
@@ -217,7 +218,31 @@ delete_atoms group penetrant
 if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
 
 next i
+
+if "${g} == linear" then "jump SELF recreate_region"
+
 jump SELF myfirstloop
+
+label recreate_region
+variable proportion equal floor(${i}*100/${num_loops})
+
+variable shift equal 0.5-0.45*${proportion}/100
+variable z_mid2 equal ((${zh}-${zl})*${shift}+${zl})
+
+
+print """
+proportion = ${proportion}
+z_mid = ${z_mid}
+z_mid2 = ${z_mid2}
+"""
+
+variable zl2 equal ${z_mid2}
+variable zh2 equal ${z_mid2}
+region mobileR2 delete
+region mobileR2 block ${xl1} ${xh1} ${yl1} ${yh1} ${zl2} ${zh2}
+
+jump SELF myfirstloop
+
 
 print """
 Top of Gas = $h
