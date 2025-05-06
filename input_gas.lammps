@@ -98,16 +98,6 @@ label do_npt
   variable z_mid2 equal ((${zh}-${zl})*0.5+${zl})
 
 
-  variable xl1 equal ${x_mid}
-  variable xh1 equal ${x_mid}
-  variable yl1 equal ${y_mid}
-  variable yh1 equal ${y_mid}
-  variable zl1 equal ${z_mid}
-  variable zh1 equal ${z_mid}
-
-
-  variable zl2 equal ${z_mid2}
-  variable zh2 equal ${z_mid2}
 
 
   print """
@@ -115,8 +105,8 @@ label do_npt
   y_mid = ${y_mid}
   z_mid = ${z_mid}
   """
-  region mobileR block ${xl1} ${xh1} ${yl1} ${yh1}  ${zl1} ${zh1}
-  region mobileR2 block ${xl1} ${xh1} ${yl1} ${yh1} ${zl2} ${zh2}
+  region mobileR block ${x_mid} ${x_mid} ${y_mid} ${y_mid}  ${z_mid} ${z_mid}
+  region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid2} ${z_mid2}
 
   #region mobileR block ${x_mid-1} ${x_mid+1} ${yl} ${yh} ${zl} ${zh}
 
@@ -237,7 +227,7 @@ z_mid2 = ${z_mid2}
 """
 
 region mobileR2 delete
-region mobileR2 block ${xl1} ${xh1} ${yl1} ${yh1} ${z_mid2} ${z_mid2}
+region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid2} ${z_mid2}
 
 jump SELF myfirstloop
 
