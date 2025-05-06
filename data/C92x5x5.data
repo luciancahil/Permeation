@@ -14,7 +14,7 @@ LAMMPS data output Created by a python Script - (Written by Roy He)
 
   0   19.7 xlo xhi
   0   15.2 ylo yhi
-  -15.176166   91.056996 zlo zhi
+  -15.176166   78 zlo zhi
 
 Masses
 
