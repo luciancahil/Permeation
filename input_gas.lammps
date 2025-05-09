@@ -3,10 +3,13 @@
 # command to run:
 # lmp -var F C92x5x5.data -var M H2.lmp -var T solubility -var NM 1 -i input_gas.lammps
 
-# lmp -var F C92x5x5.data -var M H2.lmp -var M2 CH4.lmp -var T solubility -var NM 2 -i input_gas.lammps
+# lmp -var F C92x5x5.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 2 -var g linear -i input_gas.lammps
 
-# F is file, M is molecule
+# F is file, M is molecule, T is task, NM is "num momlecules", g is generation style
 
+
+# If g is "random", generate all molecules randomly.
+# If g is "linear", generate the first molecule at around the center, and generate the second molecule gradually further and further away.
 processors 1 1 1
 units real
 atom_style full
@@ -62,10 +65,14 @@ label do_freeze
 
   jump SELF after_logic
 
+
+
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 100000
+  run 100
+  unfix 3all
    # define mobile ensemble
+  
   variable xl equal xlo
   variable xh equal xhi
   variable yl equal ylo
@@ -73,8 +80,37 @@ label do_npt
   variable zl equal zlo
   variable zh equal zhi
 
-  unfix 3all
+
+  if "${g} == linear" then "jump SELF linear_regions"
+
+
   region mobileR block ${xl} ${xh} ${yl} ${yh} ${zl} ${zh}
+  region mobileR2 block ${xl} ${xh} ${yl} ${yh} ${zl} ${zh}
+  jump SELF after_logic
+
+
+
+  label linear_regions
+  variable x_mid equal ((${xh}+${xl})/2)
+  variable y_mid equal ((${yh}+${yl})/2)
+  variable z_mid equal ((${zh}-${zl})*0.55+${zl})
+
+  variable z_mid2 equal ((${zh}-${zl})*0.5+${zl})
+
+
+
+
+  print """
+  x_mid = ${x_mid}
+  y_mid = ${y_mid}
+  z_mid = ${z_mid}
+  """
+  region mobileR block ${x_mid} ${x_mid} ${y_mid} ${y_mid}  ${z_mid} ${z_mid}
+  region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid2} ${z_mid2}
+
+  #region mobileR block ${x_mid-1} ${x_mid+1} ${yl} ${yh} ${zl} ${zh}
+
+
   jump SELF after_logic
 
 
@@ -87,10 +123,13 @@ label do_normal
 
 
 label after_logic
+
+
 print """
 FILE = $F
 Molecule_labe = $M
 Task = $T
+generation = ${g}
 """
 
 # define ensemble for mobile region
@@ -119,8 +158,9 @@ dump 2 all xyz 100 outputs/all_$F_$M_${NM}_$T.xyz
 
 variable natoms equal atoms
 
+variable num_loops equal 10000
 
-variable i loop 10000
+variable i loop ${num_loops}
 
 
 label myfirstloop
@@ -129,7 +169,7 @@ variable s equal step
 create_atoms 0 random 1 $s mobileR mol penetrantMol 55 overlap 0.3 maxtry 5000
 
 if "${NM} == 1" then "jump SELF done_create"
-create_atoms 0 random 1 $s mobileR mol penetrantMol2 55 overlap 0.3 maxtry 5000
+create_atoms 0 random 1 $s mobileR2 mol penetrantMol2 55 overlap 0.3 maxtry 5000
 
 label done_create
 group penetrant id > 2300
@@ -165,8 +205,32 @@ minimize 0.0 1.0e-4 1000 100004
 
 
 delete_atoms group penetrant
+if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
+
 next i
+
+if "${g} == linear" then "jump SELF recreate_region"
+
 jump SELF myfirstloop
+
+label recreate_region
+variable proportion equal floor(${i}*100/${num_loops})
+
+variable shift equal 0.5-0.45*${proportion}/100
+variable z_mid2 equal ((${zh}-${zl})*${shift}+${zl})
+
+
+print """
+proportion = ${proportion}
+z_mid = ${z_mid}
+z_mid2 = ${z_mid2}
+"""
+
+region mobileR2 delete
+region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid2} ${z_mid2}
+
+jump SELF myfirstloop
+
 
 print """
 Top of Gas = $h
