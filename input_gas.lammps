@@ -96,17 +96,17 @@ label do_npt
   variable z_mid equal ((${zh}-${zl})*0.55+${zl})
 
   variable z_mid2 equal ((${zh}-${zl})*0.5+${zl})
-
+  variable x_mid1 equal (${x_mid}+1)
+  variable y_mid1 equal (${y_mid}+1)
 
 
 
   print """
   x_mid = ${x_mid}
-  y_mid = ${y_mid}
-  z_mid = ${z_mid}
+  x_mid1 = ${x_mid1}
   """
-  region mobileR block ${x_mid} ${x_mid} ${y_mid} ${y_mid}  ${z_mid} ${z_mid}
-  region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid2} ${z_mid2}
+  region mobileR block ${x_mid1} ${x_mid1} ${y_mid1} ${y_mid1}  ${z_mid} ${z_mid}
+  region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid} ${z_mid}
 
   #region mobileR block ${x_mid-1} ${x_mid+1} ${yl} ${yh} ${zl} ${zh}
 
