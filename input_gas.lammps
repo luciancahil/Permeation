@@ -68,7 +68,7 @@ label do_freeze
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 10000
+  run 1
   unfix 3all
    # define mobile ensemble
   
@@ -152,8 +152,16 @@ label done_gen
 
 
 group penetrant id > 2300
+
+if "${NM} == 1" then "jump SELF one_mol_dump"
+dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${M2}_$T.xyz id type x y z vx vy vz fx fy fz mol
+dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${M2}_$T.xyz 
+jump SELF done_dump
+label one_mol_dump
 dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_$T.xyz id type x y z vx vy vz fx fy fz mol
 dump 2 all xyz 100 outputs/all_$F_$M_${NM}_$T.xyz 
+
+label done_dump
 
 variable natoms equal atoms
 
@@ -166,15 +174,25 @@ label myfirstloop
 variable s equal step
 
 create_atoms 0 random 1 $s mobileR mol penetrantMol 55 overlap 0.3 maxtry 5000
-variable m loop ${NM}
-next m
 
 
 
 
+print """
+NM: ${NM}
+print: ${NM} == 1
+"""
 
 if "${NM} == 1" then "jump SELF done_create"
 
+
+variable m loop ${NM}
+# 1 for the fist atom
+next m
+
+print """
+Why is this printing?
+"""
 
 label creating_others
 create_atoms 0 random 1 $s mobileR2 mol penetrantMol2 55 overlap 0.3 maxtry 5000
@@ -182,14 +200,9 @@ create_atoms 0 random 1 $s mobileR2 mol penetrantMol2 55 overlap 0.3 maxtry 5000
 next m
 jump SELF creating_others
 
-# 1 for the fist atom
-
-
-if "${NM} == 2" then "jump SELF done_create"
-
 
 label done_create
-group penetrant id > 2300
+group penetrant id > 4600
 variable expected equal ${natoms}
 
 
