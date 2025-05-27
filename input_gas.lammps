@@ -3,7 +3,7 @@
 # command to run:
 # lmp -var F C92x5x5.data -var M H2.lmp -var T solubility -var NM 1 -i input_gas.lammps
 
-# lmp -var F C92x5x5.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 2 -var g linear -i input_gas.lammps
+# lmp -var F C92x5x5.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 4 -var g random -i input_gas.lammps
 
 # F is file, M is molecule, T is task, NM is "num momlecules", g is generation style
 
@@ -167,9 +167,27 @@ label myfirstloop
 variable s equal step
 
 create_atoms 0 random 1 $s mobileR mol penetrantMol 55 overlap 0.3 maxtry 5000
+variable m loop ${NM}
+next m
+
+
+
+
 
 if "${NM} == 1" then "jump SELF done_create"
+
+
+label creating_others
 create_atoms 0 random 1 $s mobileR2 mol penetrantMol2 55 overlap 0.3 maxtry 5000
+
+next m
+jump SELF creating_others
+
+# 1 for the fist atom
+
+
+if "${NM} == 2" then "jump SELF done_create"
+
 
 label done_create
 group penetrant id > 2300
