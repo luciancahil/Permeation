@@ -7,7 +7,7 @@ LAMMPS data output Created by a python Script - (Written by Roy He)
      3000 impropers
 
      2 atom types
-     2 bond types
+     3 bond types
      3 angle types
      2 dihedral types
      1 improper types
@@ -30,6 +30,7 @@ Bond Coeffs
 
        1   268.0000     1.5290 
        2   340.0000     1.0900 
+       3   820.0000     0.7400
 
 Angle Coeffs 
 
