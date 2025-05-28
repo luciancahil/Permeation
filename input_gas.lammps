@@ -178,11 +178,6 @@ create_atoms 0 random 1 $s mobileR mol penetrantMol 55 overlap 0.3 maxtry 5000
 
 
 
-print """
-NM: ${NM}
-print: ${NM} == 1
-"""
-
 if "${NM} == 1" then "jump SELF done_create"
 
 
@@ -190,9 +185,6 @@ variable m loop ${NM}
 # 1 for the fist atom
 next m
 
-print """
-Why is this printing?
-"""
 
 label creating_others
 create_atoms 0 random 1 $s mobileR2 mol penetrantMol2 55 overlap 0.3 maxtry 5000
