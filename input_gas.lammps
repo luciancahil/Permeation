@@ -68,7 +68,7 @@ label do_freeze
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 1
+  run 10000
   unfix 3all
    # define mobile ensemble
   
