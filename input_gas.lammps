@@ -2,9 +2,9 @@
 
 # command to run:
 
-# lmp -var F C92x5x10.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 4 -var g random -i input_gas.lammps
+# lmp -var F C92x5x10.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 4 -var g random -i input_gas.lammps -var RT 1000 -var RS 4500
 
-# F is file, M is molecule, T is task, NM is "num momlecules", g is generation style
+# F is file, M is molecule, T is task, NM is "num momlecules", g is generation style, RT is "RoundTime" in timesteps (number of timesteps)
 
 
 # If g is "random", generate all molecules randomly.
@@ -154,18 +154,18 @@ label done_gen
 group penetrant id > 2300
 
 if "${NM} == 1" then "jump SELF one_mol_dump"
-dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${M2}_$T.xyz id type x y z vx vy vz fx fy fz mol
-dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${M2}_$T.xyz 
+dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${M2}_${RT}_${RS}_$T.xyz id type x y z vx vy vz fx fy fz mol
+dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${RT}_${RS}_${M2}_$T.xyz 
 jump SELF done_dump
 label one_mol_dump
-dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_$T.xyz id type x y z vx vy vz fx fy fz mol
-dump 2 all xyz 100 outputs/all_$F_$M_${NM}_$T.xyz 
+dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${RT}_${RS}_$T.xyz id type x y z vx vy vz fx fy fz mol
+dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${RT}_${RS}_$T.xyz 
 
 label done_dump
 
 variable natoms equal atoms
 
-variable num_loops equal 4500
+variable num_loops equal ${RS}
 
 variable i loop ${num_loops}
 
@@ -217,7 +217,7 @@ if "${natoms} < ${expected}" then "jump SELF jumpError"
 print """
 The Minimization Stopped at Step = $s
 """
-run 1000
+run ${RT}
 
 
 print """
