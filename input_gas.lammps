@@ -2,9 +2,10 @@
 
 # command to run:
 
-# lmp -var F C92x5x10.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 4 -var g random -i input_gas.lammps -var RT 1000 -var RS 4500
+# lmp -var F C92x5x10.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 4 -var g random -i input_gas.lammps -var RT 1000 -var RS 4500 -var matrix_size 4600
+# lmp -var F C92x5x5.data -var M H2.lmp -var M2 CH4.lmp -var T diffusion -var NM 4 -var g random -i input_gas.lammps -var RT 1000 -var RS 4500 -var matrix_size 2300
 
-# F is file, M is molecule, T is task, NM is "num momlecules", g is generation style, RT is "RoundTime" in timesteps (number of timesteps)
+# F is file, M is molecule, T is task, NM is "num momlecules", g is generation style, RT is "RoundTime" in timesteps (number of timesteps), rs is "number of rounds", cutoff is number of atoms in matrix
 
 
 # If g is "random", generate all molecules randomly.
@@ -68,7 +69,7 @@ label do_freeze
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 10000
+  run 1
   unfix 3all
    # define mobile ensemble
   
@@ -150,51 +151,50 @@ molecule penetrantMol2 molecules/${M2}
 
 label done_gen
 
-
-group penetrant id > 2300
+group penetrant id > ${matrix_size}
 
 if "${NM} == 1" then "jump SELF one_mol_dump"
-dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${M2}_${RT}_${RS}_$T.xyz id type x y z vx vy vz fx fy fz mol
-dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${RT}_${RS}_${M2}_$T.xyz 
-jump SELF done_dump
-label one_mol_dump
-dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${RT}_${RS}_$T.xyz id type x y z vx vy vz fx fy fz mol
-dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${RT}_${RS}_$T.xyz 
+  dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${M2}_${RT}_${RS}_$T.xyz id type x y z vx vy vz fx fy fz mol
+  dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${RT}_${RS}_${M2}_$T.xyz 
+  jump SELF done_dump
+  label one_mol_dump
+  dump 1 penetrant custom 1 outputs/penetrant_$F_$M_${NM}_${RT}_${RS}_$T.xyz id type x y z vx vy vz fx fy fz mol
+  dump 2 all xyz 100 outputs/all_$F_$M_${NM}_${RT}_${RS}_$T.xyz 
 
-label done_dump
+  label done_dump
 
-variable natoms equal atoms
+  variable natoms equal atoms
 
-variable num_loops equal ${RS}
+  variable num_loops equal ${RS}
 
-variable i loop ${num_loops}
-
-
-label myfirstloop
-variable s equal step
-
-create_atoms 0 random 1 $s mobileR mol penetrantMol 55 overlap 0.3 maxtry 5000
+  variable i loop ${num_loops}
 
 
+  label myfirstloop
+  variable s equal step
+
+  create_atoms 0 random 1 $s mobileR mol penetrantMol 55 overlap 0.3 maxtry 5000
 
 
-if "${NM} == 1" then "jump SELF done_create"
 
 
-variable m loop ${NM}
-# 1 for the fist atom
-next m
+  if "${NM} == 1" then "jump SELF done_create"
 
 
-label creating_others
-create_atoms 0 random 1 $s mobileR2 mol penetrantMol2 55 overlap 0.3 maxtry 5000
+  variable m loop ${NM}
+  # 1 for the fist atom
+  next m
+
+
+  label creating_others
+  create_atoms 0 random 1 $s mobileR2 mol penetrantMol2 55 overlap 0.3 maxtry 5000
 
 next m
 jump SELF creating_others
 
 
 label done_create
-group penetrant id > 4600
+group penetrant id > ${matrix_size}
 variable expected equal ${natoms}
 
 
