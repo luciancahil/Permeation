@@ -69,7 +69,7 @@ label do_freeze
 
 label do_npt
   fix 3all all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0
-  run 1
+  run 10000
   unfix 3all
    # define mobile ensemble
   
@@ -87,32 +87,6 @@ label do_npt
   region mobileR block ${xl} ${xh} ${yl} ${yh} ${zl} ${zh}
   region mobileR2 block ${xl} ${xh} ${yl} ${yh} ${zl} ${zh}
   jump SELF after_logic
-
-
-
-  label linear_regions
-  variable x_mid equal ((${xh}+${xl})/2)
-  variable y_mid equal ((${yh}+${yl})/2)
-  variable z_mid equal ((${zh}-${zl})*0.55+${zl})
-
-  variable z_mid2 equal ((${zh}-${zl})*0.5+${zl})
-  variable x_mid1 equal (${x_mid}+1)
-  variable y_mid1 equal (${y_mid}+1)
-
-
-
-  print """
-  x_mid = ${x_mid}
-  x_mid1 = ${x_mid1}
-  """
-  region mobileR block ${x_mid1} ${x_mid1} ${y_mid1} ${y_mid1}  ${z_mid} ${z_mid}
-  region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid} ${z_mid}
-
-  #region mobileR block ${x_mid-1} ${x_mid+1} ${yl} ${yh} ${zl} ${zh}
-
-
-  jump SELF after_logic
-
 
 label do_normal
   print """
@@ -230,26 +204,6 @@ delete_atoms group penetrant
 if "${T} == solubility" then "fix 3 penetrant nvt temp 300.0 300.0 100.0" elif "${T} == diffusion" "fix 1 all npt temp 300.0 300.0 100.0 iso 1.0 1.0 1000.0" else "jump SELF do_normal"
 
 next i
-
-if "${g} == linear" then "jump SELF recreate_region"
-
-jump SELF myfirstloop
-
-label recreate_region
-variable proportion equal floor(${i}*100/${num_loops})
-
-variable shift equal 0.5-0.45*${proportion}/100
-variable z_mid2 equal ((${zh}-${zl})*${shift}+${zl})
-
-
-print """
-proportion = ${proportion}
-z_mid = ${z_mid}
-z_mid2 = ${z_mid2}
-"""
-
-region mobileR2 delete
-region mobileR2 block ${x_mid} ${x_mid} ${y_mid} ${y_mid} ${z_mid2} ${z_mid2}
 
 jump SELF myfirstloop
 
